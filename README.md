@@ -40,7 +40,7 @@ Testing shows that approaches 3 (menu item click) and 4 (keyboard shortcut) are 
 
 ## License
 
-AGPL-3.0-or-later
+MIT
 
 ## Author
 
