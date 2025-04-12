@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Zotshort",
-  "version": "0.1.0",
+  "version": "0.002-alpha",
   "description": "Adds Ctrl+Alt+N shortcut to trigger 'Add Item by Identifier'",
   "homepage_url": "https://github.com/AlonResearch/zotshort#readme",
   "author": "Alon",
@@ -12,7 +12,7 @@
   "applications": {
     "zotero": {
       "id": "zotshort@alon.com",
-      "update_url": "https://github.com/AlonResearch/zotshort/releases/download/release/update.json",
+      "update_url": "https://github.com/AlonResearch/zotshort/releases/download/release/update-beta.json",
       "strict_min_version": "6.999",
       "strict_max_version": "7.*"
     }

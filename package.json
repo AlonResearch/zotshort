@@ -1,7 +1,7 @@
 {
   "name": "zotshort",
   "type": "module",
-  "version": "0.0.1-beta",
+  "version": "0.002-alpha",
   "description": "Adds Ctrl+Alt+N shortcut to trigger 'Add Item by Identifier'",
   "config": {
     "addonName": "Zotshort",
