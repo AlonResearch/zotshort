@@ -1,0 +1,14 @@
+zotshort-startup-begin = Addon is loading
+zotshort-startup-finish = Addon is ready
+zotshort-menuitem-label = Addon Template: Helper Examples
+zotshort-menupopup-label = Addon Template: Menupopup
+zotshort-menuitem-submenulabel = Addon Template
+zotshort-menuitem-filemenulabel = Addon Template: File Menuitem
+zotshort-prefs-title = Template
+zotshort-prefs-table-title = Title
+zotshort-prefs-table-detail = Detail
+zotshort-tabpanel-lib-tab-label = Lib Tab
+zotshort-tabpanel-reader-tab-label = Reader Tab
+zotshort-startup-notification = Zotshort is ready (Ctrl+Alt+N)
+zotshort-shortcut-success = Add Item by Identifier triggered
+zotshort-shortcut-error = Error triggering Add Item by Identifier

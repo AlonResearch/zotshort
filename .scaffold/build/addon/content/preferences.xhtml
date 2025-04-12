@@ -1,0 +1,33 @@
+<linkset>
+  <html:link rel="localization" href="zotshort-preferences.ftl" />
+</linkset>
+<groupbox
+  onload="Zotero.Zotshort.hooks.onPrefsEvent('load', { window });"
+>
+  <label><html:h2 data-l10n-id="zotshort-pref-title"></html:h2></label>
+  <checkbox
+    id="zotero-prefpane-zotshort-enable"
+    preference="extensions.zotero.zotshort.enable"
+    data-l10n-id="zotshort-pref-enable"
+  />
+  <hbox>
+    <html:label
+      for="zotero-prefpane-zotshort-input"
+      data-l10n-id="zotshort-pref-input"
+    ></html:label>
+    <html:input
+      type="text"
+      id="zotero-prefpane-zotshort-input"
+      preference="extensions.zotero.zotshort.input"
+    ></html:input>
+  </hbox>
+  <hbox class="virtualized-table-container" flex="1" height="300px">
+    <html:div id="zotshort-table-container" />
+  </hbox>
+</groupbox>
+<vbox>
+  <html:label
+    data-l10n-id="zotshort-pref-help"
+    data-l10n-args='{"time": "2025-04-12 19:53:30","name": "Zotshort","version":"0.1.0"}'
+  ></html:label>
+</vbox>

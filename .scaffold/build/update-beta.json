@@ -1,0 +1,19 @@
+{
+  "addons": {
+    "zotshort@alon.com": {
+      "updates": [
+        {
+          "version": "0.1.0",
+          "update_link": "https://github.com/AlonResearch/zotshort/releases/download/v0.1.0/zotshort.xpi",
+          "update_hash": "sha512:56691973b09738bbfc9beb795dd266d4022343cebe35056093fdc3c8af3caa7ef064544b0d653a32e99c6eb44222cd3c157d330a737284549bc0606b0a49d7e3",
+          "applications": {
+            "zotero": {
+              "strict_min_version": "6.999",
+              "strict_max_version": "7.*"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

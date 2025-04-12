@@ -1,0 +1,11 @@
+zotshort-item-section-example1-head-text =
+    .label = Plugin Template: Item Info
+zotshort-item-section-example1-sidenav-tooltip =
+    .tooltiptext = This is Plugin Template section (item info)
+zotshort-item-section-example2-head-text =
+    .label = Plugin Template: Reader [{$status}]
+zotshort-item-section-example2-sidenav-tooltip =
+    .tooltiptext = This is Plugin Template section (reader)
+zotshort-item-section-example2-button-tooltip =
+    .tooltiptext = Unregister this section
+zotshort-item-info-row-example-label = Example Row
