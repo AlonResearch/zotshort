@@ -3,9 +3,9 @@
     "zotshort@alon.com": {
       "updates": [
         {
-          "version": "0.002-alpha",
-          "update_link": "https://github.com/AlonResearch/zotshort/releases/download/v0.002-alpha/zotshort.xpi",
-          "update_hash": "sha512:eb300665f158d655cb2656075437a98ea617dfcb7a075a0d6b3d902b47d802cef1fac5388bcb93ecabe70e4f3e0ea3e7154d351c809e99496b6de832d4fe6a00",
+          "version": "0.003-alpha",
+          "update_link": "https://github.com/AlonResearch/zotshort/releases/download/v0.003-alpha/zotshort.xpi",
+          "update_hash": "sha512:57a82c4c37eddbcfbe76031a6becd4522b17d3a64fce62502c0f38e0e8794b566c1143369ffca69c8aeca46dfb840fa76d2abff1f65fa7e65d33e8688b43897b",
           "applications": {
             "zotero": {
               "strict_min_version": "6.999",

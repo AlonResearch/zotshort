@@ -8,7 +8,14 @@ declare namespace _ZoteroTypes {
   interface Prefs {
     PluginPrefsMap: {
       "enable": boolean;
+      "debug-notifications": boolean;
       "input": string;
+      "shortcut-addByIdentifier-key": string;
+      "shortcut-addByIdentifier-enabled": boolean;
+      "shortcut-plugins-key": string;
+      "shortcut-plugins-enabled": boolean;
+      "shortcut-settings-key": string;
+      "shortcut-settings-enabled": boolean;
     };
   }
 }

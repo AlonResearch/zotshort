@@ -9,6 +9,6 @@ zotshort-prefs-table-title = Title
 zotshort-prefs-table-detail = Detail
 zotshort-tabpanel-lib-tab-label = Lib Tab
 zotshort-tabpanel-reader-tab-label = Reader Tab
-zotshort-startup-notification = Zotshort is ready (Ctrl+Alt+N)
+zotshort-startup-notification = Zotshort v{ $version } is ready
 zotshort-shortcut-success = Add Item by Identifier triggered
 zotshort-shortcut-error = Error triggering Add Item by Identifier

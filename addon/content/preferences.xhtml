@@ -1,33 +1,88 @@
 <linkset>
-  <html:link rel="localization" href="__addonRef__-preferences.ftl" />
+  <html:link rel="localization" href="zotshort-preferences.ftl" />
 </linkset>
-<groupbox
-  onload="Zotero.__addonInstance__.hooks.onPrefsEvent('load', { window });"
->
-  <label><html:h2 data-l10n-id="pref-title"></html:h2></label>
-  <checkbox
-    id="zotero-prefpane-__addonRef__-enable"
-    preference="enable"
-    data-l10n-id="pref-enable"
-  />
-  <hbox>
-    <html:label
-      for="zotero-prefpane-__addonRef__-input"
-      data-l10n-id="pref-input"
-    ></html:label>
-    <html:input
-      type="text"
-      id="zotero-prefpane-__addonRef__-input"
-      preference="input"
-    ></html:input>
+
+<vbox class="main-container">
+  <html:h3 class="section-title">General Settings</html:h3>
+  <vbox class="settings-section">
+    <hbox class="setting-row" align="center">
+      <checkbox
+        id="zotero-prefpane-zotshort-debug-notifications"
+        preference="extensions.zotero.zotshort.debug-notifications"
+      />
+      <label class="setting-label">Show debug notifications</label>
+    </hbox>
+  </vbox>
+
+  <html:h3 class="section-title">Shortcut Preferences</html:h3>
+  <vbox class="shortcuts-container">
+    <hbox class="shortcut-row" align="center">
+      <checkbox
+        id="zotero-prefpane-zotshort-shortcut-addByIdentifier-enabled"
+        preference="extensions.zotero.zotshort.shortcut-addByIdentifier-enabled"
+      />
+      <label class="shortcut-label">Add Item by Identifier</label>
+      <button
+        type="button"
+        id="zotero-prefpane-zotshort-shortcut-addByIdentifier-key"
+        preference="extensions.zotero.zotshort-shortcut-addByIdentifier-key"
+        class="shortcut-button"
+        onclick="Zotero.Zotshort.hooks.onShortcutButtonClick(event)"
+        onkeydown="Zotero.Zotshort.hooks.onShortcutKeyDown(event)"
+        onblur="Zotero.Zotshort.hooks.onShortcutBlur(event)"
+      >
+        <html:span class="shortcut-text">Ctrl+Alt+N</html:span>
+      </button>
+    </hbox>
+
+    <hbox class="shortcut-row" align="center">
+      <checkbox
+        id="zotero-prefpane-zotshort-shortcut-plugins-enabled"
+        preference="extensions.zotero.zotshort.shortcut-plugins-enabled"
+      />
+      <label class="shortcut-label">Plugins</label>
+      <button
+        type="button"
+        id="zotero-prefpane-zotshort-shortcut-plugins-key"
+        preference="extensions.zotero.zotshort-shortcut-plugins-key"
+        class="shortcut-button"
+        onclick="Zotero.Zotshort.hooks.onShortcutButtonClick(event)"
+        onkeydown="Zotero.Zotshort.hooks.onShortcutKeyDown(event)"
+        onblur="Zotero.Zotshort.hooks.onShortcutBlur(event)"
+      >
+        <html:span class="shortcut-text">Ctrl+Alt+P</html:span>
+      </button>
+    </hbox>
+
+    <hbox class="shortcut-row" align="center">
+      <checkbox
+        id="zotero-prefpane-zotshort-shortcut-settings-enabled"
+        preference="extensions.zotero.zotshort.shortcut-settings-enabled"
+      />
+      <label class="shortcut-label">Settings</label>
+      <button
+        type="button"
+        id="zotero-prefpane-zotshort-shortcut-settings-key"
+        preference="extensions.zotero.zotshort-shortcut-settings-key"
+        class="shortcut-button"
+        onclick="Zotero.Zotshort.hooks.onShortcutButtonClick(event)"
+        onkeydown="Zotero.Zotshort.hooks.onShortcutKeyDown(event)"
+        onblur="Zotero.Zotshort.hooks.onShortcutBlur(event)"
+      >
+        <html:span class="shortcut-text">Ctrl+Alt+S</html:span>
+      </button>
+    </hbox>
+  </vbox>
+
+  <spacer style="height: 20px;"/>
+  <hbox class="action-buttons" align="end">
+    <button
+      type="button"
+      id="zotero-prefpane-zotshort-save-restart"
+      class="save-restart-button"
+      onclick="Zotero.Zotshort.hooks.onSaveRestartClick(event)"
+    >
+      <html:span>Save and Restart</html:span>
+    </button>
   </hbox>
-  <hbox class="virtualized-table-container" flex="1" height="300px">
-    <html:div id="__addonRef__-table-container" />
-  </hbox>
-</groupbox>
-<vbox>
-  <html:label
-    data-l10n-id="pref-help"
-    data-l10n-args='{"time": "__buildTime__","name": "__addonName__","version":"__buildVersion__"}'
-  ></html:label>
 </vbox>

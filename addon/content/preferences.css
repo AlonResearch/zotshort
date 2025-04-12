@@ -1,0 +1,138 @@
+.main-container {
+  padding: 32px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--material-background);
+  color: var(--fill-primary);
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--fill-primary);
+  margin: 0 0 32px 0;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--fill-primary);
+  margin: 0 0 16px 0;
+}
+
+.settings-section {
+  margin-bottom: 32px;
+  padding: 16px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.setting-label {
+  flex: 1;
+  font-size: 15px;
+  font-weight: normal;
+  color: var(--fill-primary);
+}
+
+.shortcuts-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.shortcut-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.shortcut-label {
+  flex: 1;
+  font-size: 15px;
+  font-weight: normal;
+  color: var(--fill-primary);
+  margin-inline-start: 12px;
+}
+
+.shortcut-button {
+  min-width: 200px;
+  padding: 8px 16px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: var(--fill-primary);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.shortcut-button:hover:not([disabled]) {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.shortcut-button[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.shortcut-button[recording="true"] {
+  background-color: var(--selected-background);
+  border-color: var(--selected-text);
+  color: var(--selected-text);
+}
+
+.shortcut-text {
+  flex: 1;
+  text-align: left;
+}
+
+.dropdown-arrow {
+  margin-left: 12px;
+  opacity: 0.7;
+  font-size: 10px;
+}
+
+checkbox {
+  margin: 0;
+}
+
+.action-buttons {
+  margin-top: 32px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.save-restart-button {
+  padding: 8px 16px;
+  background-color: var(--selected-background, #0060df);
+  border: 1px solid var(--selected-text, #0a84ff);
+  border-radius: 6px;
+  color: var(--fill-primary, #ffffff);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.save-restart-button:hover:not([disabled]) {
+  background-color: var(--selected-text, #0a84ff);
+  transform: translateY(-1px);
+}
+
+.save-restart-button:active:not([disabled]) {
+  transform: translateY(0);
+}
+
+.save-restart-button[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+} 

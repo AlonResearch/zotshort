@@ -3972,6 +3972,7 @@ If you do not know what it is, please click Cancel to deny.`);
   };
 
   // package.json
+  var version = "0.003-alpha";
   var config = {
     addonName: "Zotshort",
     addonID: "zotshort@alon.com",
@@ -4040,41 +4041,165 @@ If you do not know what it is, please click Cancel to deny.`);
     );
   }
 
+  // src/utils/prefs.ts
+  var PREFS_PREFIX = config.prefsPrefix;
+  function getPref(key) {
+    return Zotero.Prefs.get(`${PREFS_PREFIX}.${key}`, true);
+  }
+
+  // src/utils/notifications.ts
+  function showDebugNotification(title, options) {
+    const debugEnabled = getPref("debug-notifications");
+    if (!debugEnabled) {
+      return null;
+    }
+    return new addon.data.ztoolkit.ProgressWindow(title, {
+      closeOnClick: true,
+      closeTime: options.closeTime || 3e3
+    }).createLine({
+      text: options.text,
+      type: options.type || "default"
+    }).show();
+  }
+  function showErrorNotification(title, text) {
+    return new addon.data.ztoolkit.ProgressWindow(title, {
+      closeOnClick: true,
+      closeTime: 5e3
+    }).createLine({
+      text,
+      type: "error"
+    }).show();
+  }
+
   // src/modules/zotshort.ts
   var ZotshortFactory = class _ZotshortFactory {
+    /**
+     * Tracks when the shortcut was last triggered to prevent multiple rapid activations
+     */
     static lastTriggerTime = 0;
+    /**
+     * Time in milliseconds to wait before allowing another shortcut trigger
+     * Prevents accidental double-triggering
+     */
     static DEBOUNCE_DELAY = 300;
     // 300ms delay
     /**
-     * Register the Ctrl+Alt+N shortcut to trigger "Add Item by Identifier"
+     * Stores the currently registered keyboard shortcuts
+     */
+    static registeredShortcuts = {};
+    /**
+     * Registers keyboard shortcuts for Zotero functions based on user preferences
+     * This is the main entry point called during plugin initialization
      */
     static registerShortcuts() {
-      ztoolkit.Keyboard.register((ev, keyOptions) => {
-        if (ev.ctrlKey && ev.altKey && ev.key === "n") {
+      _ZotshortFactory.unregisterAllShortcuts();
+      _ZotshortFactory.registerAddByIdentifierShortcut();
+      _ZotshortFactory.registerPluginsShortcut();
+      _ZotshortFactory.registerSettingsShortcut();
+    }
+    /**
+     * Unregisters all currently registered shortcuts
+     */
+    static unregisterAllShortcuts() {
+      for (const shortcutKey in _ZotshortFactory.registeredShortcuts) {
+        const callback = _ZotshortFactory.registeredShortcuts[shortcutKey];
+        addon.data.ztoolkit.Keyboard.unregister(callback);
+      }
+      _ZotshortFactory.registeredShortcuts = {};
+    }
+    /**
+     * Registers the shortcut for "Add by Identifier" function
+     */
+    static registerAddByIdentifierShortcut() {
+      const shortcutEnabled = getPref("shortcut-addByIdentifier-enabled") ?? true;
+      if (!shortcutEnabled) {
+        addon.data.ztoolkit.log("Add by Identifier shortcut is disabled in preferences.");
+        return;
+      }
+      const shortcutKeyString = String(getPref("shortcut-addByIdentifier-key") || "Ctrl+Alt+N");
+      _ZotshortFactory.registerShortcutWithAction(
+        shortcutKeyString,
+        "Add Item by Identifier",
+        _ZotshortFactory.triggerAddByIdentifier
+      );
+    }
+    /**
+     * Registers the shortcut for "Plugins" menu
+     */
+    static registerPluginsShortcut() {
+      const shortcutEnabled = getPref("shortcut-plugins-enabled") ?? true;
+      if (!shortcutEnabled) {
+        addon.data.ztoolkit.log("Plugins shortcut is disabled in preferences.");
+        return;
+      }
+      const shortcutKeyString = String(getPref("shortcut-plugins-key") || "Ctrl+Alt+P");
+      _ZotshortFactory.registerShortcutWithAction(
+        shortcutKeyString,
+        "Plugins",
+        _ZotshortFactory.triggerPlugins
+      );
+    }
+    /**
+     * Registers the shortcut for "Settings" menu
+     */
+    static registerSettingsShortcut() {
+      const shortcutEnabled = getPref("shortcut-settings-enabled") ?? true;
+      if (!shortcutEnabled) {
+        addon.data.ztoolkit.log("Settings shortcut is disabled in preferences.");
+        return;
+      }
+      const shortcutKeyString = String(getPref("shortcut-settings-key") || "Ctrl+Alt+S");
+      _ZotshortFactory.registerShortcutWithAction(
+        shortcutKeyString,
+        "Settings",
+        _ZotshortFactory.triggerSettings
+      );
+    }
+    /**
+     * Helper function to register a shortcut with a specific action
+     * @param shortcutKeyString The keyboard shortcut as a string (e.g., "Ctrl+Alt+N")
+     * @param actionName The name of the action for logging/notification
+     * @param actionCallback The function to call when the shortcut is triggered
+     */
+    static registerShortcutWithAction(shortcutKeyString, actionName, actionCallback) {
+      const parts = shortcutKeyString.split("+").map((part) => part.trim().toLowerCase());
+      const key = parts.pop() || "";
+      const ctrlKey = parts.includes("ctrl");
+      const altKey = parts.includes("alt");
+      const shiftKey = parts.includes("shift");
+      const metaKey = parts.includes("meta");
+      if (!key) {
+        addon.data.ztoolkit.log(`Invalid shortcut key format for ${actionName}: ${shortcutKeyString}`, "error");
+        return;
+      }
+      const handler = (ev) => {
+        if (ev.key.toLowerCase() === key && ev.ctrlKey === ctrlKey && ev.altKey === altKey && ev.shiftKey === shiftKey && ev.metaKey === metaKey) {
           const now = Date.now();
           if (now - _ZotshortFactory.lastTriggerTime < _ZotshortFactory.DEBOUNCE_DELAY) {
             return;
           }
           _ZotshortFactory.lastTriggerTime = now;
-          new ztoolkit.ProgressWindow("Debug Info").createLine({
-            text: `Detected: Ctrl + Alt + ${ev.key.toUpperCase()}`,
-            type: "default"
-          }).createLine({
-            text: "Action: Add Item by Identifier",
-            type: "default"
-          }).show();
-          _ZotshortFactory.triggerAddByIdentifier();
+          showDebugNotification("Debug Info", {
+            text: `Detected: ${shortcutKeyString}
+Action: ${actionName}`,
+            type: "default",
+            closeTime: 2e3
+          });
+          actionCallback();
         }
-      });
-      ztoolkit.log("Registered Ctrl+Alt+N shortcut for Add Item by Identifier");
+      };
+      addon.data.ztoolkit.Keyboard.register(handler);
+      _ZotshortFactory.registeredShortcuts[`${actionName}-${shortcutKeyString}`] = handler;
+      addon.data.ztoolkit.log(`Registered '${shortcutKeyString}' shortcut for ${actionName}`);
     }
     /**
-     * Trigger the Add Item by Identifier function using menu click
+     * Trigger the Add Item by Identifier function using menu click approach
+     * This approach simulates clicking the menu item in the Zotero UI
      */
     static triggerAddByIdentifier() {
       const win = Zotero.getMainWindow();
       if (!win) {
-        ztoolkit.log("No Zotero window found");
+        addon.data.ztoolkit.log("No Zotero window found");
         return;
       }
       try {
@@ -4085,11 +4210,52 @@ If you do not know what it is, please click Cancel to deny.`);
           throw new Error("Menu item not found");
         }
       } catch (e) {
-        ztoolkit.log("Failed to trigger Add by Identifier");
-        new ztoolkit.ProgressWindow(addon.data.config.addonName).createLine({
-          text: getString("shortcut-error"),
-          type: "error"
-        }).show();
+        addon.data.ztoolkit.log("Failed to trigger Add by Identifier");
+        showErrorNotification(addon.data.config.addonName, getString("shortcut-error"));
+      }
+    }
+    /**
+     * Trigger the Plugins menu item from the Tools menu
+     */
+    static triggerPlugins() {
+      const win = Zotero.getMainWindow();
+      if (!win) {
+        addon.data.ztoolkit.log("No Zotero window found");
+        return;
+      }
+      try {
+        const menuItem = win.document.querySelector('menuitem[label*="Plugins"], menuitem[id*="plugins"]');
+        if (menuItem) {
+          menuItem.click();
+        } else {
+          throw new Error("Plugins menu item not found");
+        }
+      } catch (e) {
+        addon.data.ztoolkit.log("Failed to trigger Plugins menu");
+        showErrorNotification(addon.data.config.addonName, getString("shortcut-error"));
+      }
+    }
+    /**
+     * Trigger the Settings/Preferences menu item
+     */
+    static triggerSettings() {
+      const win = Zotero.getMainWindow();
+      if (!win) {
+        addon.data.ztoolkit.log("No Zotero window found");
+        return;
+      }
+      try {
+        const menuItem = win.document.querySelector(
+          'menuitem[label*="Preferences"], menuitem[label*="Settings"], menuitem[id*="preferences"], menuitem[id*="settings"]'
+        );
+        if (menuItem) {
+          menuItem.click();
+        } else {
+          throw new Error("Settings/Preferences menu item not found");
+        }
+      } catch (e) {
+        addon.data.ztoolkit.log("Failed to trigger Settings/Preferences menu");
+        showErrorNotification(addon.data.config.addonName, getString("shortcut-error"));
       }
     }
   };
@@ -4102,6 +4268,14 @@ If you do not know what it is, please click Cancel to deny.`);
       Zotero.uiReadyPromise
     ]);
     initLocale();
+    if (typeof Zotero.PreferencePanes !== "undefined") {
+      Zotero.PreferencePanes.register({
+        pluginID: config.addonID,
+        label: "Zotshort",
+        image: `chrome://${config.addonRef}/content/icons/favicon.png`,
+        src: `chrome://${config.addonRef}/content/preferences.xhtml`
+      });
+    }
     ZotshortFactory.registerShortcuts();
     await Promise.all(
       Zotero.getMainWindows().map((win) => onMainWindowLoad(win))
@@ -4112,14 +4286,11 @@ If you do not know what it is, please click Cancel to deny.`);
     win.MozXULElement.insertFTLIfNeeded(
       `${addon.data.config.addonRef}-mainWindow.ftl`
     );
-    const popupWin = new ztoolkit.ProgressWindow(addon.data.config.addonName, {
-      closeOnClick: true,
-      closeTime: 3e3
-    }).createLine({
-      text: getString("startup-notification"),
+    showDebugNotification(addon.data.config.addonName, {
+      text: getString("startup-notification", { args: { version } }),
       type: "success",
-      progress: 100
-    }).show();
+      closeTime: 3e3
+    });
   }
   async function onMainWindowUnload(win) {
     ztoolkit.unregisterAll();
@@ -4129,20 +4300,179 @@ If you do not know what it is, please click Cancel to deny.`);
     addon.data.alive = false;
     delete Zotero[addon.data.config.addonInstance];
   }
+  async function onPrefsEvent(type, data) {
+    switch (type) {
+      case "load":
+      case "show":
+        initializeShortcutButtons(data.window);
+        break;
+    }
+  }
+  function onShortcutCheckboxChange(event) {
+    const checkbox = event.target;
+    const prefName = checkbox.getAttribute("preference");
+    if (prefName) {
+      const xulCheckbox = checkbox;
+      Zotero.Prefs.set(prefName, xulCheckbox.checked, true);
+      ZotshortFactory.registerShortcuts();
+    }
+  }
+  function initializeShortcutButtons(window2) {
+    const doc = window2.document;
+    if (!doc) return;
+    const buttons = doc.querySelectorAll("button[preference]");
+    buttons.forEach((button) => {
+      const prefName = button.getAttribute("preference");
+      if (prefName && button instanceof HTMLButtonElement) {
+        const savedValue = Zotero.Prefs.get(prefName, true);
+        const textSpan = button.querySelector(".shortcut-text");
+        if (textSpan) {
+          if (savedValue) {
+            textSpan.textContent = savedValue;
+          } else {
+            if (button.id.includes("addByIdentifier")) {
+              textSpan.textContent = "Default: Ctrl+Alt+N";
+            } else if (button.id.includes("plugins")) {
+              textSpan.textContent = "Default: Ctrl+Alt+P";
+            } else if (button.id.includes("settings")) {
+              textSpan.textContent = "Default: Ctrl+Alt+S";
+            } else {
+              textSpan.textContent = "Click to set shortcut";
+            }
+          }
+        }
+      }
+    });
+    const checkboxes = doc.querySelectorAll("checkbox[preference]");
+    checkboxes.forEach((checkbox) => {
+      const prefName = checkbox.getAttribute("preference");
+      if (prefName) {
+        let value = Zotero.Prefs.get(prefName, true);
+        if (value === void 0) {
+          value = true;
+          Zotero.Prefs.set(prefName, value, true);
+        }
+        const xulCheckbox = checkbox;
+        xulCheckbox.checked = value;
+        checkbox.addEventListener("command", onShortcutCheckboxChange);
+      }
+    });
+  }
+  function onShortcutButtonClick(event) {
+    const button = event.target;
+    const actualButton = button.closest("button");
+    if (!actualButton || actualButton.hasAttribute("recording")) return;
+    actualButton.setAttribute("recording", "true");
+    const textSpan = actualButton.querySelector(".shortcut-text");
+    if (textSpan) {
+      textSpan.textContent = "Press shortcut keys...";
+    }
+    actualButton.focus();
+  }
+  function onShortcutKeyDown(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    const button = event.target;
+    if (!button.hasAttribute("recording")) return;
+    const keys = [];
+    if (event.ctrlKey) keys.push("Ctrl");
+    if (event.altKey) keys.push("Alt");
+    if (event.shiftKey) keys.push("Shift");
+    if (event.metaKey) keys.push("Meta");
+    const key = event.key.toLowerCase();
+    if (!["control", "alt", "shift", "meta"].includes(key)) {
+      keys.push(event.key.toUpperCase());
+      const shortcut = keys.join("+");
+      const prefName = button.getAttribute("preference");
+      if (prefName) {
+        Zotero.Prefs.set(prefName, shortcut, true);
+        const savedValue = Zotero.Prefs.get(prefName, true);
+        const textSpan = button.querySelector(".shortcut-text");
+        if (textSpan) {
+          textSpan.textContent = String(savedValue || shortcut);
+        }
+        ZotshortFactory.registerShortcuts();
+      }
+      button.removeAttribute("recording");
+      button.blur();
+    } else {
+      const textSpan = button.querySelector(".shortcut-text");
+      if (textSpan) {
+        textSpan.textContent = [...keys, "..."].join("+");
+      }
+    }
+  }
+  function onShortcutBlur(event) {
+    const button = event.target;
+    if (button.hasAttribute("recording")) {
+      button.removeAttribute("recording");
+      const prefName = button.getAttribute("preference");
+      if (prefName) {
+        const savedValue = Zotero.Prefs.get(prefName, true);
+        const textSpan = button.querySelector(".shortcut-text");
+        if (textSpan) {
+          if (savedValue) {
+            textSpan.textContent = String(savedValue);
+          } else {
+            if (button.id.includes("addByIdentifier")) {
+              textSpan.textContent = "Default: Ctrl+Alt+N";
+            } else if (button.id.includes("plugins")) {
+              textSpan.textContent = "Default: Ctrl+Alt+P";
+            } else if (button.id.includes("settings")) {
+              textSpan.textContent = "Default: Ctrl+Alt+S";
+            } else {
+              textSpan.textContent = "Click to set shortcut";
+            }
+          }
+        }
+      }
+    }
+  }
+  function onSaveRestartClick(event) {
+    event.preventDefault();
+    try {
+      ZotshortFactory.registerShortcuts();
+      new addon.data.ztoolkit.ProgressWindow("Zotshort").createLine({
+        text: "Saving changes and restarting Zotero...",
+        type: "default"
+      }).show();
+      setTimeout(() => {
+        Zotero.Utilities.Internal.quit(true);
+      }, 1e3);
+    } catch (error) {
+      showErrorNotification("Zotshort", "Failed to save changes and restart");
+      console.error("Failed to save and restart:", error);
+    }
+  }
   var hooks_default = {
     onStartup,
     onShutdown,
     onMainWindowLoad,
-    onMainWindowUnload
+    onMainWindowUnload,
+    onPrefsEvent,
+    onShortcutButtonClick,
+    onShortcutKeyDown,
+    onShortcutBlur,
+    onSaveRestartClick
   };
 
   // src/addon.ts
   var Addon = class {
+    /**
+     * Data object that holds references to various parts of the addon
+     */
     data;
-    // Lifecycle hooks
+    /**
+     * Lifecycle hooks that are called by Zotero
+     */
     hooks;
-    // APIs
+    /**
+     * Public API that can be used by other addons
+     */
     api;
+    /**
+     * Constructor initializes the addon with default values
+     */
     constructor() {
       this.data = {
         alive: true,
